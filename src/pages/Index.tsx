@@ -1,381 +1,385 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import Icon from '@/components/ui/icon';
 
-const STARS_IMG = 'https://cdn.poehali.dev/projects/feb474de-97e1-46ec-9975-47ce21c15628/files/93003cf8-7065-4fac-9ec6-a79aad1ca901.jpg';
 const HERO_IMG = 'https://cdn.poehali.dev/projects/feb474de-97e1-46ec-9975-47ce21c15628/files/941fac68-0c2f-4b91-a460-f7bc7fda8125.jpg';
 const BURAN_IMG = 'https://cdn.poehali.dev/projects/feb474de-97e1-46ec-9975-47ce21c15628/files/fd926f3d-bd48-4753-9746-3cedbebbe4c1.jpg';
+const PAPER_IMG = 'https://cdn.poehali.dev/projects/feb474de-97e1-46ec-9975-47ce21c15628/files/639811f4-7f70-4bef-9740-2cfb5686d672.jpg';
 
 const EVENTS = [
-  { year: 1957, label: '\'57', title: 'Спутник-1', sub: '4 октября 1957', body: 'Первый искусственный спутник Земли выведен на орбиту. Сигнал «бип-бип» потряс весь мир и открыл космическую эру.', icon: 'Satellite' },
-  { year: 1961, label: '\'61', title: 'Гагарин', sub: '12 апреля 1961', body: '«Поехали!» — 108 минут на орбите изменили историю человечества навсегда. Позывной «Кедр», корабль «Восток-1».', icon: 'Rocket' },
-  { year: 1963, label: '\'63', title: 'Терешкова', sub: '16 июня 1963', body: 'Валентина Терешкова, позывной «Чайка», — первая женщина в космосе. 48 витков вокруг Земли за трое суток.', icon: 'Star' },
-  { year: 1965, label: '\'65', title: 'Леонов', sub: '18 марта 1965', body: 'Первый выход человека в открытый космос. 12 минут за бортом «Восхода-2» на высоте 500 км над Землёй.', icon: 'Wind' },
-  { year: 1971, label: '\'71', title: 'Салют-1', sub: '19 апреля 1971', body: 'Запуск первой орбитальной станции. Человек получил постоянный дом на орбите.', icon: 'Orbit' },
-  { year: 1986, label: '\'86', title: 'Станция «Мир»', sub: '20 февраля 1986', body: 'Легендарная орбитальная станция проработала 15 лет и стала символом советской и российской космонавтики.', icon: 'Globe' },
-  { year: 1988, label: '\'88', title: 'Буран', sub: '15 ноября 1988', body: 'Единственный полёт многоразового корабля «Буран» — полностью автоматический, без экипажа. Венец советской инженерной мысли.', icon: 'Plane' },
+  { year: '1957', date: '4 октября 1957', title: 'СССР ЗАПУСТИЛ ПЕРВЫЙ СПУТНИК ЗЕМЛИ', short: 'Спутник-1', text: 'Советский Союз открыл новую страницу в истории человечества. Искусственный спутник Земли, выведенный на орбиту ракетой-носителем, непрерывно излучает радиосигналы. Сигнал «бип-бип» услышал весь мир.', icon: 'Satellite' },
+  { year: '1961', date: '12 апреля 1961', title: 'СОВЕТСКИЙ ЧЕЛОВЕК ВПЕРВЫЕ В КОСМОСЕ!', short: 'Гагарин', text: 'Лётчик-космонавт майор Юрий Алексеевич Гагарин совершил первый в истории полёт человека в космическое пространство. Облетев земной шар за 108 минут, корабль «Восток-1» благополучно приземлился.', icon: 'Rocket' },
+  { year: '1963', date: '16 июня 1963', title: 'СОВЕТСКАЯ ЖЕНЩИНА ПОКОРИЛА КОСМОС', short: 'Терешкова', text: 'Валентина Владимировна Терешкова совершила орбитальный полёт на космическом корабле «Восток-6». За 70 часов 50 минут «Чайка» выполнила 48 витков вокруг Земли, доказав равенство советских женщин.', icon: 'Star' },
+  { year: '1965', date: '18 марта 1965', title: 'СОВЕТСКИЙ КОСМОНАВТ ВЫШЕЛ В ОТКРЫТЫЙ КОСМОС', short: 'Леонов', text: 'Алексей Архипович Леонов впервые в истории вышел в открытый космос. Находясь вне корабля «Восход-2» 12 минут 9 секунд, он продемонстрировал возможность деятельности человека в открытом космосе.', icon: 'Wind' },
+  { year: '1971', date: '19 апреля 1971', title: 'ЗАПУЩЕНА ПЕРВАЯ ОРБИТАЛЬНАЯ СТАНЦИЯ', short: 'Салют-1', text: 'В Советском Союзе выведена на орбиту первая в мире долговременная орбитальная станция «Салют-1». Это открывает новую эру в освоении космического пространства.', icon: 'Orbit' },
+  { year: '1986', date: '20 февраля 1986', title: 'ОРБИТАЛЬНЫЙ КОМПЛЕКС «МИР» ВЫВЕДЕН НА ОРБИТУ', short: 'Станция «Мир»', text: 'Советский многомодульный орбитальный комплекс «Мир» начал работу. Уникальная конструкция рассчитана на длительную эксплуатацию и станет форпостом человечества в космосе.', icon: 'Globe' },
+  { year: '1988', date: '15 ноября 1988', title: 'СОВЕТСКИЙ «БУРАН» СОВЕРШИЛ ПЕРВЫЙ ПОЛЁТ', short: 'Буран', text: 'Многоразовый орбитальный корабль «Буран» успешно выведен на орбиту и совершил автоматическую посадку. Уникальное достижение советской науки и техники не имеет аналогов в мировой практике.', icon: 'Plane' },
 ];
 
 const HEROES = [
-  { id: 'gagarin', name: 'Гагарин', full: 'Юрий Алексеевич Гагарин', role: 'Первый человек в космосе', years: '1934–1968', call: 'Кедр', duration: '108 мин', orbits: '1', text: 'Лётчик-истребитель из Гжатска, отобранный из 3000 кандидатов. После полёта стал символом эпохи и самым известным человеком на планете. Погиб в авиакатастрофе в 34 года.' },
-  { id: 'tereshkova', name: 'Терешкова', full: 'Валентина Владимировна Терешкова', role: 'Первая женщина в космосе', years: 'р. 1937', call: 'Чайка', duration: '70 ч 50 мин', orbits: '48', text: 'До отбора в отряд космонавтов работала на текстильном комбинате и занималась прыжками с парашютом. Единственная в мире женщина, летавшая в космос в одиночку.' },
-  { id: 'leonov', name: 'Леонов', full: 'Алексей Архипович Леонов', role: 'Первый выход в открытый космос', years: '1934–2019', call: 'Алмаз-2', duration: '12 мин', orbits: '—', text: 'Художник и космонавт. Скафандр раздулся так, что Леонов с трудом вернулся в корабль. Написал десятки картин о космосе. Участник миссии «Союз–Аполлон» 1975 года.' },
-  { id: 'korolev', name: 'Королёв', full: 'Сергей Павлович Королёв', role: 'Главный конструктор', years: '1907–1966', call: 'засекречен', duration: '—', orbits: '—', text: 'Гений, чьё имя было засекречено до смерти. Прошёл ГУЛАГ, создал первую межконтинентальную ракету, спутник и корабль «Восток». Умер на операционном столе в 59 лет.' },
+  { name: 'Ю.А. Гагарин', full: 'Юрий Алексеевич Гагарин', role: 'Лётчик-космонавт СССР, Герой Советского Союза', years: '1934–1968', text: 'Первый в истории человечества космонавт. Уроженец Смоленской области, военный лётчик-истребитель, он был отобран из 3000 кандидатов для исторического полёта. После триумфа стал символом советской эпохи. Трагически погиб в авиакатастрофе вблизи города Киржач в возрасте 34 лет.' },
+  { name: 'В.В. Терешкова', full: 'Валентина Владимировна Терешкова', role: 'Лётчик-космонавт СССР, Герой Советского Союза', years: 'р. 1937', text: 'До отбора в отряд космонавтов работала на Ярославском шинном заводе и серьёзно занималась парашютным спортом. Единственная в истории женщина, самостоятельно управлявшая космическим кораблём. Депутат Верховного Совета СССР многих созывов.' },
+  { name: 'А.А. Леонов', full: 'Алексей Архипович Леонов', role: 'Лётчик-космонавт СССР, дважды Герой Советского Союза', years: '1934–2019', text: 'Художник и космонавт. Написал более двухсот картин, посвящённых космосу. Во время выхода в открытый космос его скафандр раздулся настолько, что возвращение на борт потребовало исключительного мужества. Участник советско-американского полёта «Союз–Аполлон» в 1975 году.' },
+  { name: 'С.П. Королёв', full: 'Сергей Павлович Королёв', role: 'Главный конструктор ракетно-космических систем', years: '1907–1966', text: 'Личность Королёва была строго засекречена и стала известна широкой публике лишь после его смерти. Прошёл сталинские лагеря, выжил и создал всё: первую межконтинентальную ракету, спутник, «Восток». Скончался на операционном столе в январе 1966 года, так и не узнав, что именно он навсегда изменил историю.' },
 ];
-
-const DOCS = [
-  { icon: 'FileText', cat: 'Постановление', title: 'О запуске «Востока-1»', year: '1961', stamp: 'Сов. секретно' },
-  { icon: 'Pencil', cat: 'Чертёж', title: 'Схема отсеков «Востока»', year: '1960', stamp: 'ОКБ-1' },
-  { icon: 'Mic', cat: 'Запись', title: 'Переговоры Заря — Кедр', year: '1961', stamp: 'Аудио' },
-  { icon: 'BookOpen', cat: 'Отчёт', title: 'Лётные испытания «Бурана»', year: '1988', stamp: 'НПО «Энергия»' },
-  { icon: 'Camera', cat: 'Фото', title: 'Станция «Мир» из открытого космоса', year: '1987', stamp: 'Архив' },
-  { icon: 'Award', cat: 'Указ', title: 'Герой СССР — Ю.А. Гагарин', year: '1961', stamp: 'Президиум ВС' },
-];
-
-function useInView(ref: React.RefObject<Element>) {
-  const [inView, setInView] = useState(false);
-  useEffect(() => {
-    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setInView(true); }, { threshold: 0.15 });
-    if (ref.current) obs.observe(ref.current);
-    return () => obs.disconnect();
-  }, []);
-  return inView;
-}
-
-function RevealBlock({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref as React.RefObject<Element>);
-  return (
-    <div
-      ref={ref}
-      className={className}
-      style={{
-        opacity: inView ? 1 : 0,
-        transform: inView ? 'translateY(0)' : 'translateY(32px)',
-        transition: `opacity 0.7s ease ${delay}ms, transform 0.7s ease ${delay}ms`,
-      }}
-    >
-      {children}
-    </div>
-  );
-}
 
 export default function Index() {
   const [activeEvent, setActiveEvent] = useState(1);
   const [activeHero, setActiveHero] = useState(0);
-  const [menuOpen, setMenuOpen] = useState(false);
   const ev = EVENTS[activeEvent];
   const hero = HEROES[activeHero];
 
-  const scrollTo = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-    setMenuOpen(false);
-  };
+  const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
 
   return (
-    <div className="bg-[#06090f] text-white min-h-screen font-body overflow-x-hidden">
+    <div
+      className="min-h-screen font-body text-[#1a1008]"
+      style={{
+        backgroundColor: '#f2e8d0',
+        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E")`,
+      }}
+    >
 
-      {/* ── NAV ─────────────────────────────────────────── */}
-      <nav className="fixed top-0 inset-x-0 z-50 flex items-center justify-between px-6 md:px-12 h-14"
-        style={{ background: 'linear-gradient(to bottom, rgba(6,9,15,0.95), transparent)' }}>
-        <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="flex items-center gap-2 font-display font-bold uppercase tracking-[0.18em] text-sm text-white">
-          <span className="text-orange-500">✦</span> Космос СССР
-        </button>
-        <div className="hidden md:flex gap-8 font-display uppercase text-[11px] tracking-[0.25em] text-white/40">
-          {['timeline','heroes','archive','gallery'].map(id => (
-            <button key={id} onClick={() => scrollTo(id)} className="hover:text-orange-400 transition-colors">
-              {id === 'timeline' ? 'Хронология' : id === 'heroes' ? 'Герои' : id === 'archive' ? 'Архив' : 'Галерея'}
-            </button>
-          ))}
+      {/* ══ ШАПКА ГАЗЕТЫ ══════════════════════════════════════ */}
+      <header className="border-b-4 border-[#1a1008]">
+        {/* верхняя строка */}
+        <div className="flex items-center justify-between px-6 md:px-10 py-2 border-b border-[#1a1008]/30 text-[10px] font-display uppercase tracking-[0.25em] text-[#1a1008]/50">
+          <span>Орган Советского народа</span>
+          <span>Среда, 12 апреля 1961 года</span>
+          <span>Цена 2 коп.</span>
         </div>
-        <button className="md:hidden text-white/60 hover:text-white" onClick={() => setMenuOpen(!menuOpen)}>
-          <Icon name={menuOpen ? 'X' : 'Menu'} size={20} />
-        </button>
-      </nav>
 
-      {menuOpen && (
-        <div className="fixed inset-0 z-40 bg-[#06090f] flex flex-col items-center justify-center gap-8">
-          {['timeline','heroes','archive','gallery'].map(id => (
-            <button key={id} onClick={() => scrollTo(id)}
-              className="font-display uppercase text-2xl tracking-[0.2em] text-white/70 hover:text-orange-400 transition-colors">
-              {id === 'timeline' ? 'Хронология' : id === 'heroes' ? 'Герои' : id === 'archive' ? 'Архив' : 'Галерея'}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* ── HERO ────────────────────────────────────────── */}
-      <section className="relative min-h-screen flex flex-col justify-end pb-20 overflow-hidden">
-        {/* starfield bg */}
-        <img src={STARS_IMG} alt="" className="absolute inset-0 w-full h-full object-cover opacity-60" />
-        <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 60% 40%, rgba(30,80,200,0.18) 0%, transparent 70%), linear-gradient(to top, #06090f 30%, transparent 100%)' }} />
-
-        {/* big year */}
-        <span className="absolute right-0 top-1/2 -translate-y-1/2 font-display font-bold text-[22vw] leading-none text-white/[0.03] select-none pointer-events-none pr-4">1961</span>
-
-        <div className="relative max-w-6xl mx-auto px-6 md:px-12 w-full">
-          <div className="mb-6 flex items-center gap-3">
-            <div className="w-8 h-px bg-orange-500" />
-            <span className="font-display uppercase text-[11px] tracking-[0.35em] text-orange-400">Информационный портал</span>
+        {/* название */}
+        <div className="px-6 md:px-10 py-5 border-b-2 border-[#1a1008] text-center relative">
+          <div className="absolute left-6 md:left-10 top-1/2 -translate-y-1/2 hidden md:flex flex-col gap-1 text-left">
+            <span className="font-display uppercase text-[9px] tracking-[0.3em] text-[#1a1008]/40">Основана</span>
+            <span className="font-display font-bold text-sm">1957 год</span>
           </div>
-          <h1 className="font-display font-bold uppercase leading-[0.85] text-[13vw] sm:text-[10vw] md:text-[8vw] max-w-4xl">
-            От<br />
-            <span className="text-orange-500">Гагарина</span><br />
-            до «Бурана»
+          <h1 className="font-display font-bold uppercase tracking-[0.05em] text-5xl md:text-7xl leading-none">
+            ЗВЁЗДНЫЙ ПУТЬ
           </h1>
-          <p className="mt-8 text-white/50 max-w-sm text-base leading-relaxed">
-            31 год советской космонавтики — хронология, биографии и архив рассекреченных документов.
+          <p className="font-display uppercase tracking-[0.6em] text-xs mt-1 text-[#1a1008]/60">
+            ежедневная газета советской космонавтики
           </p>
-          <div className="mt-10 flex flex-wrap gap-3">
-            <button onClick={() => scrollTo('timeline')}
-              className="bg-orange-500 hover:bg-orange-400 text-white font-display uppercase tracking-[0.2em] text-xs px-8 py-4 transition-colors">
-              Смотреть хронологию
-            </button>
-            <button onClick={() => scrollTo('heroes')}
-              className="border border-white/15 hover:border-white/40 text-white/60 hover:text-white font-display uppercase tracking-[0.2em] text-xs px-8 py-4 transition-all">
-              Биографии героев
-            </button>
+          <div className="absolute right-6 md:right-10 top-1/2 -translate-y-1/2 hidden md:flex flex-col gap-1 text-right">
+            <span className="font-display uppercase text-[9px] tracking-[0.3em] text-[#1a1008]/40">Выпуск</span>
+            <span className="font-display font-bold text-sm">№ 108</span>
           </div>
         </div>
 
-        {/* bottom ticker */}
-        <div className="absolute bottom-0 inset-x-0 border-t border-white/5 py-4 overflow-hidden">
-          <div className="flex gap-16 whitespace-nowrap text-white/20 font-display uppercase text-[10px] tracking-[0.3em] animate-none px-6">
-            {['1957 — Спутник', '1961 — Гагарин', '1963 — Терешкова', '1965 — Леонов', '1971 — Салют', '1986 — Мир', '1988 — Буран'].map(t => (
-              <span key={t} className="mx-8">{t}</span>
+        {/* рубрики-навигация */}
+        <div className="flex overflow-x-auto">
+          {[
+            { id: 'front', label: 'Первая полоса' },
+            { id: 'timeline', label: 'Хроника' },
+            { id: 'heroes', label: 'Герои' },
+            { id: 'archive', label: 'Документы' },
+            { id: 'gallery', label: 'Фотолетопись' },
+          ].map((n, i) => (
+            <button
+              key={n.id}
+              onClick={() => scrollTo(n.id)}
+              className="shrink-0 px-5 py-2.5 font-display uppercase text-[10px] tracking-[0.25em] border-r border-[#1a1008]/20 hover:bg-[#1a1008] hover:text-[#f2e8d0] transition-colors last:border-r-0"
+            >
+              {i > 0 && <span className="text-[#1a1008]/30 mr-1.5">{i}.</span>}{n.label}
+            </button>
+          ))}
+        </div>
+      </header>
+
+      {/* ══ ПЕРВАЯ ПОЛОСА ══════════════════════════════════════ */}
+      <section id="front" className="max-w-7xl mx-auto px-4 md:px-10 py-8">
+
+        {/* главный заголовок */}
+        <div className="border-b-2 border-[#1a1008] pb-6 mb-6 text-center">
+          <p className="font-display uppercase text-[9px] tracking-[0.4em] text-[#1a1008]/40 mb-2">Сенсационное сообщение ТАСС</p>
+          <h2 className="font-display font-bold uppercase leading-[0.88] text-4xl sm:text-5xl md:text-6xl lg:text-7xl">
+            СОВЕТСКИЙ ЧЕЛОВЕК<br />ПЕРВЫМ ПОКОРИЛ<br /><span className="italic">ВСЕЛЕННУЮ!</span>
+          </h2>
+          <div className="flex items-center justify-center gap-4 mt-4">
+            <div className="h-px flex-1 bg-[#1a1008]/20" />
+            <p className="font-display uppercase text-[10px] tracking-[0.3em] text-[#1a1008]/50">12 апреля 1961 года · Москва</p>
+            <div className="h-px flex-1 bg-[#1a1008]/20" />
+          </div>
+        </div>
+
+        {/* трёхколонная вёрстка */}
+        <div className="grid md:grid-cols-3 gap-0 divide-x divide-[#1a1008]/20">
+
+          {/* колонка 1 — текст */}
+          <div className="pr-0 md:pr-6 pb-6 md:pb-0">
+            <p className="font-display uppercase text-[9px] tracking-[0.3em] text-[#1a1008]/40 border-b border-[#1a1008]/20 pb-1 mb-3">От нашего корреспондента</p>
+            <p className="text-sm leading-relaxed text-[#1a1008]/80 text-justify hyphens-auto">
+              <span className="font-bold text-2xl float-left mr-1 leading-none mt-1">С</span>
+              егодня, 12 апреля 1961 года, в Советском Союзе выведен на орбиту вокруг Земли первый в мире космический корабль-спутник «Восток» с человеком на борту.
+            </p>
+            <p className="text-sm leading-relaxed text-[#1a1008]/80 mt-3 text-justify hyphens-auto">
+              Пилотом-космонавтом космического корабля-спутника «Восток» является гражданин Союза Советских Социалистических Республик лётчик майор <strong>Гагарин Юрий Алексеевич</strong>.
+            </p>
+            <p className="text-sm leading-relaxed text-[#1a1008]/80 mt-3 text-justify">
+              Старт космической многоступенчатой ракеты прошёл успешно, и после набора первой космической скорости и отделения от последней ступени ракеты-носителя корабль-спутник начал свободный полёт по орбите вокруг Земли.
+            </p>
+            <div className="mt-4 border-t border-[#1a1008]/20 pt-3">
+              <p className="font-display uppercase text-[9px] tracking-[0.3em] text-[#1a1008]/40">Самочувствие космонавта</p>
+              <p className="font-bold text-base mt-1">«Отличное. Настроение бодрое»</p>
+              <p className="text-[10px] text-[#1a1008]/40 mt-0.5">— доклад с борта «Востока-1»</p>
+            </div>
+          </div>
+
+          {/* колонка 2 — фото */}
+          <div className="px-0 md:px-6 py-6 md:py-0 flex flex-col items-center gap-4">
+            <div className="relative w-full">
+              <img
+                src={HERO_IMG}
+                alt="Гагарин"
+                className="w-full object-cover"
+                style={{ filter: 'grayscale(100%) contrast(1.2) brightness(0.9)', maxHeight: 340, objectPosition: 'top' }}
+              />
+              <div className="absolute bottom-0 inset-x-0 bg-[#1a1008] text-[#f2e8d0] text-center py-2 px-3">
+                <p className="font-display uppercase text-[9px] tracking-[0.3em]">Лётчик-космонавт майор</p>
+                <p className="font-display font-bold uppercase text-sm">Ю.А. Гагарин</p>
+              </div>
+            </div>
+            {/* цитата */}
+            <div className="border-l-4 border-[#1a1008] pl-4 w-full">
+              <p className="font-display italic text-xl leading-tight font-bold">"Поехали!"</p>
+              <p className="text-[10px] text-[#1a1008]/50 mt-1 font-display uppercase tracking-widest">— Ю.А. Гагарин, 09:07 МСК</p>
+            </div>
+            <div className="w-full border border-[#1a1008]/20 p-3 bg-[#1a1008]/5">
+              <p className="font-display uppercase text-[9px] tracking-[0.3em] text-[#1a1008]/40 mb-2">Параметры полёта</p>
+              {[['Продолжительность', '108 минут'], ['Максимальная высота', '327 км'], ['Орбит вокруг Земли', '1'], ['Скорость', '27 400 км/ч']].map(([k, v]) => (
+                <div key={k} className="flex justify-between text-xs border-b border-[#1a1008]/10 py-1 last:border-0">
+                  <span className="text-[#1a1008]/60">{k}</span>
+                  <span className="font-bold">{v}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* колонка 3 — текст */}
+          <div className="pl-0 md:pl-6 pt-6 md:pt-0">
+            <p className="font-display uppercase text-[9px] tracking-[0.3em] text-[#1a1008]/40 border-b border-[#1a1008]/20 pb-1 mb-3">Специальный репортаж</p>
+            <p className="text-sm leading-relaxed text-[#1a1008]/80 text-justify">
+              По облёте земного шара в соответствии с намеченной программой была включена тормозная двигательная установка и космический корабль-спутник начал снижаться с орбиты.
+            </p>
+            <p className="text-sm leading-relaxed text-[#1a1008]/80 mt-3 text-justify">
+              После успешного проведения намеченных исследований и выполнения программы полёта в 10 часов 55 минут московского времени советский космический корабль «Восток» совершил благополучную посадку в заданном районе Советского Союза.
+            </p>
+            <div className="mt-4 bg-[#1a1008] text-[#f2e8d0] p-4">
+              <p className="font-display uppercase text-[9px] tracking-[0.3em] text-[#f2e8d0]/50 mb-2">Сообщение ТАСС</p>
+              <p className="text-xs leading-relaxed italic">
+                «Первый полёт человека в космос — это торжество ленинских идей, могущества советского народа, его науки и техники…»
+              </p>
+            </div>
+            <div className="mt-4 border border-[#1a1008]/30 p-3">
+              <p className="font-display font-bold uppercase text-[10px] tracking-[0.2em] mb-2">Также в номере:</p>
+              {['Поздравления со всего мира — стр. 2', 'Биография Ю.А. Гагарина — стр. 3', 'Ракета-носитель «Восток» — стр. 4'].map(s => (
+                <p key={s} className="text-[10px] text-[#1a1008]/60 py-1 border-b border-[#1a1008]/10 last:border-0">• {s}</p>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ══ ХРОНИКА ════════════════════════════════════════════ */}
+      <section id="timeline" className="border-t-4 border-[#1a1008]">
+        <div className="max-w-7xl mx-auto px-4 md:px-10 py-8">
+          <div className="flex items-center gap-4 mb-6">
+            <h2 className="font-display font-bold uppercase text-2xl tracking-wide">ХРОНИКА КОСМИЧЕСКОЙ ГОНКИ</h2>
+            <div className="flex-1 border-t-2 border-[#1a1008]" />
+            <span className="font-display uppercase text-[9px] tracking-[0.3em] text-[#1a1008]/40">1957–1988</span>
+          </div>
+
+          {/* годы */}
+          <div className="flex gap-0 overflow-x-auto mb-6 border border-[#1a1008]/30">
+            {EVENTS.map((e, i) => (
+              <button
+                key={e.year}
+                onClick={() => setActiveEvent(i)}
+                className={`shrink-0 px-5 py-3 font-display font-bold text-sm border-r border-[#1a1008]/20 last:border-r-0 transition-colors ${
+                  i === activeEvent ? 'bg-[#1a1008] text-[#f2e8d0]' : 'hover:bg-[#1a1008]/10'
+                }`}
+              >
+                {e.year}
+              </button>
+            ))}
+          </div>
+
+          {/* активное событие */}
+          <div className="grid md:grid-cols-[1fr_2fr] gap-0 border border-[#1a1008]/30">
+            <div className="border-r border-[#1a1008]/30 p-6 bg-[#1a1008]/5">
+              <p className="font-display uppercase text-[9px] tracking-[0.3em] text-[#1a1008]/40 mb-1">{ev.date}</p>
+              <div className="font-display font-bold text-[80px] leading-none text-[#1a1008]/10 select-none">{ev.year}</div>
+              <div className="mt-2 flex items-center gap-3">
+                <div className="w-9 h-9 border-2 border-[#1a1008] flex items-center justify-center">
+                  <Icon name={ev.icon} size={16} />
+                </div>
+                <span className="font-display uppercase text-xs tracking-widest text-[#1a1008]/50">{ev.short}</span>
+              </div>
+            </div>
+            <div className="p-6 md:p-8">
+              <p className="font-display uppercase text-[9px] tracking-[0.3em] text-[#1a1008]/40 mb-3">Экстренный выпуск · ТАСС</p>
+              <h3 className="font-display font-bold uppercase text-xl md:text-2xl leading-tight mb-4">{ev.title}</h3>
+              <p className="text-sm leading-relaxed text-[#1a1008]/75 text-justify">{ev.text}</p>
+              <div className="flex gap-2 mt-6">
+                <button onClick={() => setActiveEvent(i => Math.max(0, i - 1))} disabled={activeEvent === 0}
+                  className="border border-[#1a1008]/30 px-3 py-1.5 font-display uppercase text-[10px] tracking-widest disabled:opacity-30 hover:bg-[#1a1008] hover:text-[#f2e8d0] transition-colors">
+                  ← Предыд.
+                </button>
+                <button onClick={() => setActiveEvent(i => Math.min(EVENTS.length - 1, i + 1))} disabled={activeEvent === EVENTS.length - 1}
+                  className="border border-[#1a1008]/30 px-3 py-1.5 font-display uppercase text-[10px] tracking-widest disabled:opacity-30 hover:bg-[#1a1008] hover:text-[#f2e8d0] transition-colors">
+                  Следующ. →
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* лента снизу */}
+          <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-px bg-[#1a1008]/15">
+            {EVENTS.map((e, i) => (
+              <button key={e.year} onClick={() => setActiveEvent(i)}
+                className={`py-3 px-3 text-left transition-colors ${i === activeEvent ? 'bg-[#1a1008] text-[#f2e8d0]' : 'bg-[#f2e8d0] hover:bg-[#1a1008]/10'}`}>
+                <p className="font-display font-bold text-base">{e.year}</p>
+                <p className="font-display uppercase text-[8px] tracking-widest opacity-50 mt-0.5 truncate">{e.short}</p>
+              </button>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── TIMELINE ────────────────────────────────────── */}
-      <section id="timeline" className="py-32 max-w-6xl mx-auto px-6 md:px-12">
-        <RevealBlock>
-          <div className="flex items-center gap-4 mb-4">
-            <span className="font-display text-[11px] uppercase tracking-[0.35em] text-orange-500">01 — Хронология</span>
+      {/* ══ ГЕРОИ ══════════════════════════════════════════════ */}
+      <section id="heroes" className="border-t-4 border-[#1a1008]">
+        <div className="max-w-7xl mx-auto px-4 md:px-10 py-8">
+          <div className="flex items-center gap-4 mb-6">
+            <h2 className="font-display font-bold uppercase text-2xl tracking-wide">ГЕРОИ СОВЕТСКОЙ КОСМОНАВТИКИ</h2>
+            <div className="flex-1 border-t-2 border-[#1a1008]" />
           </div>
-          <h2 className="font-display font-bold uppercase text-5xl md:text-6xl leading-none mb-16">
-            Ключевые<br /><span className="text-blue-400">события</span>
-          </h2>
-        </RevealBlock>
 
-        {/* year scrubber */}
-        <RevealBlock delay={100}>
-          <div className="flex gap-1 mb-12 overflow-x-auto pb-2">
-            {EVENTS.map((e, i) => (
-              <button key={e.year} onClick={() => setActiveEvent(i)}
-                className={`shrink-0 px-5 py-3 font-display uppercase text-sm tracking-widest transition-all ${
-                  i === activeEvent
-                    ? 'bg-orange-500 text-white'
-                    : 'bg-white/5 text-white/30 hover:bg-white/10 hover:text-white/60'
-                }`}>
-                {e.label}
+          {/* выбор */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-[#1a1008]/20 mb-0">
+            {HEROES.map((h, i) => (
+              <button key={h.name} onClick={() => setActiveHero(i)}
+                className={`py-4 px-4 text-left transition-colors ${i === activeHero ? 'bg-[#1a1008] text-[#f2e8d0]' : 'bg-[#f2e8d0] hover:bg-[#1a1008]/8'}`}>
+                <p className={`font-display uppercase text-[8px] tracking-[0.3em] mb-1 ${i === activeHero ? 'text-[#f2e8d0]/40' : 'text-[#1a1008]/40'}`}>0{i + 1}</p>
+                <p className="font-display font-bold uppercase text-sm leading-tight">{h.name}</p>
               </button>
             ))}
           </div>
-        </RevealBlock>
 
-        <RevealBlock delay={150}>
-          <div className="grid md:grid-cols-[1fr_1.8fr] gap-0 border border-white/8">
-            {/* left — big year */}
-            <div className="bg-white/[0.02] border-r border-white/8 p-10 flex flex-col justify-between">
-              <div>
-                <p className="font-display uppercase text-[10px] tracking-[0.35em] text-white/30 mb-2">{ev.sub}</p>
-                <div className="font-display font-bold text-[80px] leading-none text-orange-500/20">{ev.year}</div>
-              </div>
-              <div className="mt-auto">
-                <div className="w-10 h-10 bg-orange-500/10 border border-orange-500/30 flex items-center justify-center mb-4">
-                  <Icon name={ev.icon} size={18} className="text-orange-400" />
-                </div>
-                <p className="font-display uppercase text-[10px] tracking-[0.3em] text-white/30">Событие {activeEvent + 1} из {EVENTS.length}</p>
-              </div>
-            </div>
-            {/* right — content */}
-            <div className="p-10 md:p-14">
-              <h3 className="font-display font-bold uppercase text-4xl md:text-5xl leading-tight mb-6">{ev.title}</h3>
-              <p className="text-white/60 text-lg leading-relaxed">{ev.body}</p>
-              <div className="mt-10 flex gap-2">
-                {EVENTS.map((_, i) => (
-                  <button key={i} onClick={() => setActiveEvent(i)}
-                    className={`transition-all rounded-full ${i === activeEvent ? 'bg-orange-500 w-8 h-2' : 'bg-white/15 w-2 h-2 hover:bg-white/30'}`} />
+          <div className="border border-[#1a1008]/30 border-t-0 grid md:grid-cols-[1fr_2fr]">
+            <div className="border-r border-[#1a1008]/30 p-6 bg-[#1a1008]/5">
+              <p className="font-display uppercase text-[8px] tracking-[0.35em] text-[#1a1008]/40 mb-1">{hero.role}</p>
+              <h3 className="font-display font-bold uppercase text-xl leading-tight">{hero.full}</h3>
+              <p className="text-[#1a1008]/40 font-display uppercase tracking-widest text-[10px] mt-1">{hero.years}</p>
+              <div className="mt-4 border-t border-[#1a1008]/15 pt-4">
+                <p className="font-display uppercase text-[8px] tracking-[0.3em] text-[#1a1008]/40 mb-2">Ссылки по теме</p>
+                {['Полная биография', 'Архив документов', 'Фотоматериалы'].map(l => (
+                  <p key={l} className="text-[10px] text-[#1a1008]/50 py-1 border-b border-[#1a1008]/10 last:border-0 flex items-center justify-between">
+                    <span>→ {l}</span>
+                  </p>
                 ))}
               </div>
             </div>
+            <div className="p-6 md:p-8">
+              <p className="font-display uppercase text-[9px] tracking-[0.3em] text-[#1a1008]/40 mb-3 border-b border-[#1a1008]/15 pb-2">Биографическая справка</p>
+              <p className="text-sm leading-relaxed text-[#1a1008]/80 text-justify">{hero.text}</p>
+            </div>
           </div>
-        </RevealBlock>
-
-        {/* mini list */}
-        <div className="mt-4 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-px bg-white/5">
-          {EVENTS.map((e, i) => (
-            <button key={e.year} onClick={() => setActiveEvent(i)}
-              className={`py-4 px-3 text-center transition-all ${i === activeEvent ? 'bg-blue-600' : 'bg-[#06090f] hover:bg-white/5'}`}>
-              <p className="font-display font-bold text-lg">{e.label}</p>
-              <p className="font-display uppercase text-[9px] tracking-widest text-white/30 mt-0.5 truncate">{e.title}</p>
-            </button>
-          ))}
         </div>
       </section>
 
-      {/* ── HEROES ──────────────────────────────────────── */}
-      <section id="heroes" className="py-32 border-t border-white/5"
-        style={{ background: 'linear-gradient(160deg, #0a1628 0%, #06090f 100%)' }}>
-        <div className="max-w-6xl mx-auto px-6 md:px-12">
-          <RevealBlock>
-            <div className="flex items-center gap-4 mb-4">
-              <span className="font-display text-[11px] uppercase tracking-[0.35em] text-blue-400">02 — Биографии</span>
-            </div>
-            <h2 className="font-display font-bold uppercase text-5xl md:text-6xl leading-none mb-16">
-              Герои<br /><span className="text-orange-500">космоса</span>
-            </h2>
-          </RevealBlock>
-
-          {/* hero tabs */}
-          <RevealBlock delay={100}>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-white/5 mb-0">
-              {HEROES.map((h, i) => (
-                <button key={h.id} onClick={() => setActiveHero(i)}
-                  className={`py-5 px-4 text-left transition-all ${i === activeHero ? 'bg-blue-600' : 'bg-[#08111f] hover:bg-white/5'}`}>
-                  <p className="font-display text-[10px] uppercase tracking-[0.3em] text-white/30 mb-1">0{i + 1}</p>
-                  <p className="font-display font-bold uppercase text-base">{h.name}</p>
-                </button>
-              ))}
-            </div>
-          </RevealBlock>
-
-          <RevealBlock delay={200}>
-            <div key={hero.id} className="border border-white/8 border-t-0 grid md:grid-cols-[2fr_3fr]">
-              {/* stats */}
-              <div className="border-r border-white/8 p-10 flex flex-col gap-6">
-                <div>
-                  <p className="font-display uppercase text-[10px] tracking-[0.35em] text-orange-400 mb-1">{hero.role}</p>
-                  <h3 className="font-display font-bold uppercase text-3xl leading-tight">{hero.full}</h3>
-                  <p className="text-white/30 font-display uppercase tracking-widest text-xs mt-2">{hero.years}</p>
-                </div>
-                <div className="flex flex-col gap-3 mt-2">
-                  {[
-                    { label: 'Позывной', val: hero.call },
-                    { label: 'Продолж. полёта', val: hero.duration },
-                    { label: 'Витков на орбите', val: hero.orbits },
-                  ].map(s => (
-                    <div key={s.label} className="flex justify-between items-center py-3 border-b border-white/5">
-                      <span className="font-display uppercase text-[10px] tracking-widest text-white/30">{s.label}</span>
-                      <span className="font-display font-bold text-sm text-orange-300">{s.val}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              {/* bio text */}
-              <div className="p-10 md:p-14 flex flex-col justify-between">
-                <p className="text-white/65 text-xl leading-relaxed">{hero.text}</p>
-                <button className="mt-8 self-start font-display uppercase text-[11px] tracking-[0.3em] text-blue-400 hover:text-blue-300 flex items-center gap-2 transition-colors">
-                  Подробнее <Icon name="ArrowRight" size={14} />
-                </button>
-              </div>
-            </div>
-          </RevealBlock>
-        </div>
-      </section>
-
-      {/* ── ARCHIVE ─────────────────────────────────────── */}
-      <section id="archive" className="py-32 max-w-6xl mx-auto px-6 md:px-12">
-        <RevealBlock>
-          <div className="flex items-center gap-4 mb-4">
-            <span className="font-display text-[11px] uppercase tracking-[0.35em] text-orange-500">03 — Архив</span>
+      {/* ══ АРХИВ ДОКУМЕНТОВ ═══════════════════════════════════ */}
+      <section id="archive" className="border-t-4 border-[#1a1008]">
+        <div className="max-w-7xl mx-auto px-4 md:px-10 py-8">
+          <div className="flex items-center gap-4 mb-6">
+            <h2 className="font-display font-bold uppercase text-2xl tracking-wide">АРХИВ РАССЕКРЕЧЕННЫХ ДОКУМЕНТОВ</h2>
+            <div className="flex-1 border-t-2 border-[#1a1008]" />
+            <span className="font-display uppercase text-[9px] tracking-[0.3em] text-[#1a1008]/40">Гриф снят</span>
           </div>
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-16">
-            <h2 className="font-display font-bold uppercase text-5xl md:text-6xl leading-none">
-              Документы<br /><span className="text-blue-400">эпохи</span>
-            </h2>
-            <p className="text-white/30 max-w-xs text-sm font-display uppercase tracking-widest leading-relaxed">
-              Рассекреченные материалы советской космической программы
-            </p>
-          </div>
-        </RevealBlock>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-px bg-white/5">
-          {DOCS.map((d, i) => (
-            <RevealBlock key={d.title} delay={i * 60}>
-              <div className="bg-[#06090f] p-8 group cursor-pointer hover:bg-[#0d1a30] transition-all h-full">
-                <div className="flex items-start justify-between mb-8">
-                  <div className="w-11 h-11 bg-white/5 group-hover:bg-orange-500/15 border border-white/8 group-hover:border-orange-500/30 flex items-center justify-center transition-all">
-                    <Icon name={d.icon} size={18} className="text-white/40 group-hover:text-orange-400 transition-colors" />
-                  </div>
-                  <span className="font-display uppercase text-[9px] tracking-widest text-white/20 border border-white/8 px-2 py-1">{d.stamp}</span>
+          <div className="divide-y divide-[#1a1008]/15 border border-[#1a1008]/20">
+            {[
+              { cat: 'Постановление', title: 'О подготовке и запуске космического корабля «Восток-1»', year: '1961', stamp: 'Совершенно секретно', icon: 'FileText' },
+              { cat: 'Технический чертёж', title: 'Схема отсеков и систем жизнеобеспечения корабля «Восток»', year: '1960', stamp: 'ОКБ-1', icon: 'Pencil' },
+              { cat: 'Аудиозапись', title: 'Переговоры наземной службы «Заря» с космонавтом «Кедром»', year: '1961', stamp: 'Фонозапись', icon: 'Mic' },
+              { cat: 'Технический отчёт', title: 'Итоги лётных испытаний орбитального корабля «Буран»', year: '1988', stamp: 'НПО «Энергия»', icon: 'BookOpen' },
+              { cat: 'Фотодокумент', title: 'Съёмка орбитальной станции «Мир» из открытого космоса', year: '1987', stamp: 'Фотоархив', icon: 'Camera' },
+              { cat: 'Указ Президиума', title: 'О присвоении звания Героя Советского Союза майору Ю.А. Гагарину', year: '1961', stamp: 'Президиум ВС СССР', icon: 'Award' },
+            ].map((d, i) => (
+              <div key={d.title} className="flex items-start gap-4 px-5 py-4 hover:bg-[#1a1008]/5 transition-colors cursor-pointer group">
+                <div className="w-8 h-8 border border-[#1a1008]/30 flex items-center justify-center shrink-0 mt-0.5">
+                  <Icon name={d.icon} size={14} className="text-[#1a1008]/50 group-hover:text-[#1a1008]" />
                 </div>
-                <p className="font-display uppercase text-[10px] tracking-[0.3em] text-white/25 mb-2">{d.cat} · {d.year}</p>
-                <h3 className="font-display font-semibold text-lg leading-snug text-white/80 group-hover:text-white transition-colors">{d.title}</h3>
-                <div className="mt-6 flex items-center gap-2 text-white/20 group-hover:text-blue-400 transition-colors">
-                  <span className="font-display uppercase text-[10px] tracking-widest">Открыть</span>
-                  <Icon name="ArrowUpRight" size={14} />
+                <div className="flex-1 min-w-0">
+                  <p className="font-display uppercase text-[8px] tracking-[0.3em] text-[#1a1008]/40">{d.cat} · {d.year}</p>
+                  <p className="font-display font-semibold text-sm mt-0.5 leading-snug">{d.title}</p>
+                </div>
+                <div className="shrink-0 flex items-center gap-3">
+                  <span className="hidden sm:inline font-display uppercase text-[8px] tracking-widest text-[#1a1008]/30 border border-[#1a1008]/15 px-2 py-0.5">{d.stamp}</span>
+                  <Icon name="ArrowUpRight" size={14} className="text-[#1a1008]/20 group-hover:text-[#1a1008]/60 transition-colors" />
                 </div>
               </div>
-            </RevealBlock>
-          ))}
-        </div>
-      </section>
-
-      {/* ── GALLERY ─────────────────────────────────────── */}
-      <section id="gallery" className="py-32 border-t border-white/5 bg-[#04070d]">
-        <div className="max-w-6xl mx-auto px-6 md:px-12">
-          <RevealBlock>
-            <div className="flex items-center gap-4 mb-4">
-              <span className="font-display text-[11px] uppercase tracking-[0.35em] text-blue-400">04 — Галерея</span>
-            </div>
-            <h2 className="font-display font-bold uppercase text-5xl md:text-6xl leading-none mb-16">
-              Образы<br /><span className="text-orange-500">эпохи</span>
-            </h2>
-          </RevealBlock>
-
-          <RevealBlock delay={100}>
-            <div className="grid grid-cols-12 grid-rows-2 gap-3 h-[520px]">
-              {/* large */}
-              <div className="col-span-12 md:col-span-8 row-span-2 relative overflow-hidden group">
-                <img src={BURAN_IMG} alt="Буран" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" style={{ filter: 'brightness(0.7) saturate(0.5)' }} />
-                <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #04070d 0%, transparent 60%)' }} />
-                <div className="absolute bottom-0 left-0 p-8">
-                  <p className="font-display uppercase text-[10px] tracking-[0.35em] text-orange-400 mb-2">1988 · Байконур</p>
-                  <h3 className="font-display font-bold uppercase text-3xl md:text-4xl leading-tight">Многоразовый<br />корабль «Буран»</h3>
-                </div>
-              </div>
-              {/* top right */}
-              <div className="col-span-12 md:col-span-4 row-span-1 relative overflow-hidden group">
-                <img src={HERO_IMG} alt="Гагарин" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" style={{ filter: 'brightness(0.65) saturate(0.3)' }} />
-                <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #04070d 0%, transparent 50%)' }} />
-                <div className="absolute bottom-0 left-0 p-6">
-                  <p className="font-display uppercase text-[10px] tracking-[0.35em] text-orange-400 mb-1">1961</p>
-                  <h3 className="font-display font-bold uppercase text-xl">Юрий Гагарин</h3>
-                </div>
-              </div>
-              {/* bottom right — stat */}
-              <div className="col-span-12 md:col-span-4 row-span-1 bg-blue-600 p-8 flex flex-col justify-between">
-                <Icon name="Telescope" size={28} className="text-blue-200" />
-                <div>
-                  <p className="font-display font-bold text-5xl text-white">500<span className="text-blue-200 text-2xl">+</span></p>
-                  <p className="font-display uppercase text-[10px] tracking-[0.3em] text-blue-200 mt-1">архивных снимков</p>
-                  <button className="mt-4 font-display uppercase text-[10px] tracking-widest text-orange-300 hover:text-orange-200 flex items-center gap-2 transition-colors">
-                    Открыть архив <Icon name="ArrowRight" size={12} />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </RevealBlock>
-        </div>
-      </section>
-
-      {/* ── FOOTER ──────────────────────────────────────── */}
-      <footer className="border-t border-white/5 py-10 px-6 md:px-12">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-2 font-display font-bold uppercase tracking-[0.2em] text-sm">
-            <span className="text-orange-500">✦</span> Космос СССР
-          </div>
-          <div className="flex gap-8 font-display uppercase text-[10px] tracking-[0.25em] text-white/25">
-            {['timeline','heroes','archive','gallery'].map(id => (
-              <button key={id} onClick={() => scrollTo(id)} className="hover:text-white/60 transition-colors">
-                {id === 'timeline' ? 'Хронология' : id === 'heroes' ? 'Герои' : id === 'archive' ? 'Архив' : 'Галерея'}
-              </button>
             ))}
           </div>
-          <p className="text-white/15 font-display uppercase tracking-widest text-[10px]">1957 — 1988</p>
+        </div>
+      </section>
+
+      {/* ══ ФОТОЛЕТОПИСЬ ═══════════════════════════════════════ */}
+      <section id="gallery" className="border-t-4 border-[#1a1008]">
+        <div className="max-w-7xl mx-auto px-4 md:px-10 py-8">
+          <div className="flex items-center gap-4 mb-6">
+            <h2 className="font-display font-bold uppercase text-2xl tracking-wide">ФОТОЛЕТОПИСЬ ЭПОХИ</h2>
+            <div className="flex-1 border-t-2 border-[#1a1008]" />
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-4">
+            {/* большое фото */}
+            <div className="md:col-span-2">
+              <div className="relative">
+                <img src={BURAN_IMG} alt="Буран" className="w-full object-cover"
+                  style={{ filter: 'grayscale(100%) contrast(1.15) brightness(0.9)', maxHeight: 420 }} />
+                <div className="border border-[#1a1008]/20 border-t-0 p-3 bg-[#1a1008]/5">
+                  <p className="font-display uppercase text-[8px] tracking-[0.3em] text-[#1a1008]/40">Фото ТАСС · 15 ноября 1988</p>
+                  <p className="font-display font-bold uppercase text-sm mt-0.5">Орбитальный корабль «Буран» на стартовой позиции космодрома Байконур</p>
+                </div>
+              </div>
+            </div>
+
+            {/* правая колонка */}
+            <div className="flex flex-col gap-4">
+              <div>
+                <img src={HERO_IMG} alt="Гагарин" className="w-full object-cover"
+                  style={{ filter: 'grayscale(100%) contrast(1.2) brightness(0.85)', maxHeight: 240, objectPosition: 'top' }} />
+                <div className="border border-[#1a1008]/20 border-t-0 p-3 bg-[#1a1008]/5">
+                  <p className="font-display uppercase text-[8px] tracking-[0.3em] text-[#1a1008]/40">Фото ТАСС · 1961</p>
+                  <p className="font-display font-bold uppercase text-xs mt-0.5">Ю.А. Гагарин перед стартом</p>
+                </div>
+              </div>
+
+              {/* врезка */}
+              <div className="border-2 border-[#1a1008] p-5 flex-1 bg-[#1a1008] text-[#f2e8d0]">
+                <p className="font-display uppercase text-[8px] tracking-[0.35em] text-[#f2e8d0]/40 mb-3">Из фотоархива</p>
+                <p className="font-display font-bold text-4xl leading-none">500+</p>
+                <p className="font-display uppercase text-[9px] tracking-[0.2em] text-[#f2e8d0]/50 mt-1">архивных снимков</p>
+                <p className="text-xs text-[#f2e8d0]/60 mt-4 leading-relaxed">
+                  Уникальная фотоколлекция советской космической программы с 1957 по 1991 год.
+                </p>
+                <button className="mt-4 font-display uppercase text-[10px] tracking-widest border border-[#f2e8d0]/30 px-4 py-2 hover:bg-[#f2e8d0] hover:text-[#1a1008] transition-colors">
+                  Открыть архив →
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ══ ПОДВАЛ ═════════════════════════════════════════════ */}
+      <footer className="border-t-4 border-[#1a1008] mt-4">
+        <div className="max-w-7xl mx-auto px-4 md:px-10 py-5 flex flex-col md:flex-row items-center justify-between gap-3">
+          <p className="font-display font-bold uppercase tracking-[0.1em] text-lg">ЗВЁЗДНЫЙ ПУТЬ</p>
+          <p className="font-display uppercase text-[9px] tracking-[0.3em] text-[#1a1008]/40 text-center">
+            Ежедневная газета советской космонавтики · Основана в 1957 году · Тираж 3 500 000 экз.
+          </p>
+          <p className="font-display uppercase text-[9px] tracking-[0.3em] text-[#1a1008]/30">© 1957–1988</p>
         </div>
       </footer>
 
